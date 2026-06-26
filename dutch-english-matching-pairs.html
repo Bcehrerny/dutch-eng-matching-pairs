@@ -6,7 +6,7 @@
 <title>Dutch – English Vocabulary</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;padding:24px 16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;padding:20px 16px}
 #app{max-width:760px;margin:0 auto}
 
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px}
@@ -15,11 +15,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .stat{font-size:12px;color:#666;background:#fff;border:1px solid #ddd;border-radius:6px;padding:4px 10px}
 .stat span{font-weight:600;color:#1a1a18}
 
-.tab-bar{display:flex;border-bottom:1px solid #ddd;margin-bottom:18px}
-.tab{padding:8px 18px;font-size:13px;border:none;background:none;color:#888;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;margin-bottom:-1px}
-.tab.active{color:#1a6ef5;border-bottom-color:#1a6ef5;font-weight:500}
-.tab:hover:not(.active){background:#eeeeec}
-.tab:disabled{opacity:.4;cursor:default;pointer-events:none}
+/* page = top-level view, only one visible at a time */
+.page{display:none}
+.page.active{display:block}
 
 button{cursor:pointer;font-family:inherit;font-size:13px;border-radius:6px;padding:7px 16px;border:1px solid #ccc;background:#fff;color:#1a1a18;transition:background .12s,border-color .12s}
 button:hover{background:#eeeeec;border-color:#aaa}
@@ -27,16 +25,30 @@ button.primary{background:#1a1a18;color:#fff;border-color:#1a1a18}
 button.primary:hover{background:#333}
 button.accent{background:#1a6ef5;color:#fff;border-color:#1a6ef5}
 button.accent:hover{background:#1558cc}
+button.danger{background:#fff;color:#c0392b;border-color:#f5c6c6}
+button.danger:hover{background:#fdeaea}
 button:disabled{opacity:.38;cursor:default;pointer-events:none}
-.hidden{display:none!important}
 
-/* STUDY */
-.study-intro{font-size:14px;color:#555;margin-bottom:16px;line-height:1.6}
+/* ── TAB BAR ── */
+.tab-bar{display:flex;border-bottom:1px solid #ddd;margin-bottom:18px}
+.tab{padding:8px 18px;font-size:13px;border:none;background:none;color:#888;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;margin-bottom:-1px}
+.tab.active{color:#1a6ef5;border-bottom-color:#1a6ef5;font-weight:500}
+.tab:hover:not(.active){background:#eeeeec}
+
+/* ── HOME ── */
+.home-card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:20px;margin-bottom:14px}
+.home-card h2{font-size:15px;font-weight:600;margin-bottom:6px}
+.home-card p{font-size:13px;color:#666;margin-bottom:14px;line-height:1.55}
+.home-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.review-empty{font-size:13px;color:#aaa}
+
+/* ── STUDY TABLE ── */
+.study-intro{font-size:14px;color:#555;margin-bottom:14px;line-height:1.6}
 .study-intro strong{color:#1a1a18}
-.study-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;margin-bottom:20px;font-size:14px}
+.study-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;margin-bottom:18px;font-size:14px}
 .study-table thead{background:#f0f0ee}
-.study-table th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #ddd}
-.study-table td{padding:9px 16px;border-bottom:1px solid #f0f0ee}
+.study-table th{padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #ddd}
+.study-table td{padding:8px 14px;border-bottom:1px solid #f0f0ee}
 .study-table tr:last-child td{border-bottom:none}
 .study-table tr:hover td{background:#fafaf8}
 .study-table .num{color:#bbb;font-size:12px;width:28px}
@@ -44,42 +56,44 @@ button:disabled{opacity:.38;cursor:default;pointer-events:none}
 .study-table .english{color:#555}
 .study-actions{display:flex;gap:10px;justify-content:flex-end}
 
-/* GAME */
-.game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.game-subtitle{font-size:13px;color:#888}
+/* ── GAME ── */
+.game-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.game-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mode-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.mode-badge.learn{background:#e6f7ee;color:#166b3c}
+.mode-badge.review{background:#fff3e0;color:#a05c00}
 .accuracy-badge{font-size:12px;background:#eaf1fe;color:#1a4eb5;border-radius:20px;padding:3px 12px;font-weight:500}
+
 .bar-row{margin-bottom:14px}
 .bar-label{font-size:11px;color:#aaa;margin-bottom:4px;display:flex;justify-content:space-between}
 .bar{height:5px;background:#e8e8e6;border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;background:#22a05b;transition:width .4s ease}
+
 .msg{font-size:13px;color:#888;text-align:center;padding:4px 0 10px;min-height:26px}
-.mode-badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;margin-left:8px;vertical-align:middle}
-.mode-badge.learn{background:#e6f7ee;color:#166b3c}
-.mode-badge.review{background:#fff3e0;color:#a05c00}
 
 .game-area{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .col-header{font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-.cards-col{display:flex;flex-direction:column;gap:7px;min-height:240px}
+.cards-col{display:flex;flex-direction:column;gap:7px;min-height:220px}
 
-.card{padding:10px 14px;border-radius:7px;border:1.5px solid #ddd;background:#fff;font-size:14px;color:#1a1a18;cursor:pointer;user-select:none;min-height:42px;display:flex;align-items:center;word-break:break-word;line-height:1.4;transition:border-color .12s,background .12s,opacity .28s,transform .28s}
+.card{padding:10px 14px;border-radius:7px;border:1.5px solid #ddd;background:#fff;font-size:14px;color:#1a1a18;cursor:pointer;user-select:none;min-height:42px;display:flex;align-items:center;word-break:break-word;line-height:1.4;transition:border-color .12s,background .12s}
 .card:hover{border-color:#999;background:#f8f8f6}
 .card.selected{border-color:#1a6ef5;background:#eaf1fe;color:#1a4eb5}
 .card.correct{border-color:#22a05b;background:#e6f7ee;color:#166b3c;pointer-events:none}
 .card.error{border-color:#e03030;background:#fdeaea;color:#a82020;animation:shake .38s ease}
-.card.vanish{opacity:0;transform:scale(.88);pointer-events:none}
-.placeholder{min-height:42px;border-radius:7px;border:1.5px dashed #e0e0de;background:#f8f8f6;pointer-events:none}
 .card.appear{animation:appear .22s ease forwards}
+.placeholder{min-height:42px;border-radius:7px;border:1.5px dashed #e0e0de;background:#f8f8f6;pointer-events:none}
 
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-@keyframes appear{from{opacity:0;transform:translateY(6px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes appear{from{opacity:0;transform:translateY(5px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 
 .success-box{text-align:center;padding:2.5rem 1rem}
 .success-box h2{font-size:22px;font-weight:600;margin-bottom:8px}
 .success-box p{color:#666;font-size:14px;margin-bottom:20px;line-height:1.6}
 .success-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 
-/* VOCAB */
-.vocab-section h3{font-size:14px;font-weight:600;margin-bottom:10px}
+/* ── VOCAB ── */
+.vocab-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.vocab-topbar h3{font-size:15px;font-weight:600}
 .word-list{max-height:340px;overflow-y:auto;border:1px solid #ddd;border-radius:7px;margin-bottom:12px}
 .word-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid #eee;font-size:13px}
 .word-row:last-child{border-bottom:none}
@@ -89,9 +103,9 @@ button:disabled{opacity:.38;cursor:default;pointer-events:none}
 .m-label{font-size:11px;color:#bbb;white-space:nowrap}
 .m-label.tested{color:#555;font-weight:500}
 .m-bar-wrap{width:72px;height:4px;background:#eee;border-radius:2px;overflow:hidden}
-.m-bar-fill{height:100%;border-radius:2px;transition:width .3s}
-.word-row .del-btn{padding:2px 8px;font-size:12px;color:#c0392b;border-color:#f5c6c6;background:#fff5f5;border-radius:5px;flex-shrink:0}
-.word-row .del-btn:hover{background:#fdeaea}
+.m-bar-fill{height:100%;border-radius:2px}
+.del-btn{padding:2px 8px;font-size:12px;color:#c0392b;border-color:#f5c6c6;background:#fff5f5;border-radius:5px;flex-shrink:0}
+.del-btn:hover{background:#fdeaea}
 .add-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .add-row input{flex:1;min-width:110px;height:34px;font-size:13px;padding:0 10px;border:1.5px solid #ccc;border-radius:6px;background:#fff;color:#1a1a18;font-family:inherit;outline:none}
 .add-row input:focus{border-color:#1a6ef5}
@@ -100,14 +114,6 @@ button:disabled{opacity:.38;cursor:default;pointer-events:none}
 .csv-label:hover{background:#eeeeec}
 .csv-hint{font-size:11px;color:#aaa}
 .empty-hint{color:#aaa;font-size:13px;padding:14px 12px}
-
-/* HOME screen */
-.home-screen{padding:8px 0}
-.home-section{background:#fff;border:1px solid #ddd;border-radius:10px;padding:20px;margin-bottom:16px}
-.home-section h2{font-size:15px;font-weight:600;margin-bottom:6px}
-.home-section p{font-size:13px;color:#666;margin-bottom:14px;line-height:1.55}
-.home-actions{display:flex;gap:10px;flex-wrap:wrap}
-.review-empty{font-size:13px;color:#aaa;padding:4px 0}
 </style>
 </head>
 <body>
@@ -120,113 +126,100 @@ button:disabled{opacity:.38;cursor:default;pointer-events:none}
     </div>
   </div>
 
-  <div class="tab-bar">
-    <button class="tab active" id="tab-btn-home"  onclick="showTab('home')">Home</button>
-    <button class="tab"        id="tab-btn-vocab" onclick="showTab('vocab')">Vocabulary</button>
+  <div class="tab-bar" id="main-tabs">
+    <button class="tab active" onclick="showMainTab('learn')">Learn</button>
+    <button class="tab" onclick="showMainTab('vocab')">Vocabulary</button>
   </div>
 
-  <!-- HOME tab -->
-  <div id="tab-home">
-
-    <!-- 0: home screen (mode chooser) -->
-    <div id="screen-home" class="home-screen">
-      <div class="home-section">
-        <h2>Learn new words</h2>
-        <p>Study a set of 20 words, then test yourself with 40 matching rounds. Weak words appear more often.</p>
-        <div class="home-actions">
-          <button class="primary" onclick="startLearn()">Study &amp; Test &rarr;</button>
-        </div>
-      </div>
-      <div class="home-section" id="review-section">
-        <h2>Review</h2>
-        <p>Jump straight into a 40-round matching test using all words you have practised before.</p>
-        <div class="home-actions" id="review-actions"></div>
+  <!-- PAGE: home -->
+  <div id="page-home" class="page active">
+    <div class="home-card">
+      <h2>Learn new words</h2>
+      <p>Study a set of 20 words, then test yourself with 40 matching rounds. Weak words appear more often.</p>
+      <div class="home-actions">
+        <button class="primary" onclick="goStudy()">Study &amp; Test &rarr;</button>
       </div>
     </div>
-
-    <!-- 1: study table (learn mode only) -->
-    <div id="screen-study" class="hidden">
-      <p class="study-intro">Study these <strong id="study-count">20</strong> words, then press <strong>Start test</strong> when ready.</p>
-      <table class="study-table">
-        <thead><tr><th class="num">#</th><th class="dutch">Dutch</th><th class="english">English</th></tr></thead>
-        <tbody id="study-tbody"></tbody>
-      </table>
-      <div class="study-actions">
-        <button onclick="showScreen('home')">Back</button>
-        <button class="primary" onclick="beginGame()">Start test &rarr;</button>
-      </div>
-    </div>
-
-    <!-- 2: game -->
-    <div id="screen-game" class="hidden">
-      <div class="game-header">
-        <div class="game-subtitle" id="game-subtitle">
-          Pairs: 0 / 40
-          <span class="mode-badge learn" id="mode-badge">Learn</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px"><div class="accuracy-badge" id="accuracy-badge">Accuracy: &ndash;</div><button id="btn-finish" onclick="finishEarly()" style="font-size:12px;padding:4px 12px;color:#888;border-color:#ddd;">Finish</button></div>
-      </div>
-
-      <div class="bar-row">
-        <div class="bar-label"><span>Progress</span><span id="overall-pct">0 / 40</span></div>
-        <div class="bar"><div class="bar-fill" id="overall-fill" style="width:0%"></div></div>
-      </div>
-
-      <div class="msg" id="msg">Click a Dutch word, then its English match.</div>
-
-      <div class="game-area" id="game-area">
-        <div>
-          <div class="col-header">NL &mdash; Dutch</div>
-          <div class="cards-col" id="col-dutch"></div>
-        </div>
-        <div>
-          <div class="col-header">EN &mdash; English</div>
-          <div class="cards-col" id="col-english"></div>
-        </div>
-      </div>
-
-      <div id="success-box" class="success-box hidden">
-        <h2 id="sc-title"></h2>
-        <p id="sc-body"></p>
-        <div class="success-actions" id="sc-actions"></div>
-      </div>
-    </div>
-
-  </div><!-- /tab-home -->
-
-  <!-- VOCAB tab -->
-  <div id="tab-vocab" class="hidden">
-    <div class="vocab-section">
-      <h3>Word list</h3>
-      <div class="word-list" id="word-list"></div>
-      <div class="add-row">
-        <input id="inp-dutch" placeholder="Dutch word" />
-        <input id="inp-english" placeholder="English word" />
-        <button onclick="addWord()">Add</button>
-      </div>
-      <div class="csv-row">
-        <label class="csv-label">
-          <input type="file" accept=".csv" onchange="importCSV(event)" style="display:none">
-          Import CSV
-        </label>
-        <button onclick="exportCSV()">Export CSV</button>
-        <span class="csv-hint">Format: dutch,english</span>
-      </div>
+    <div class="home-card">
+      <h2>Review</h2>
+      <p>Jump straight into a 40-round matching test using all words you have practised before.</p>
+      <div class="home-actions" id="review-actions"></div>
     </div>
   </div>
 
-</div><!-- /app -->
+  <!-- PAGE: study -->
+  <div id="page-study" class="page">
+    <p class="study-intro">Study these <strong id="study-count">20</strong> words, then press <strong>Start test</strong> when ready.</p>
+    <table class="study-table">
+      <thead><tr><th class="num">#</th><th class="dutch">Dutch</th><th class="english">English</th></tr></thead>
+      <tbody id="study-tbody"></tbody>
+    </table>
+    <div class="study-actions">
+      <button onclick="goHome()">Back</button>
+      <button class="primary" id="btn-start-test" onclick="startTest()">Start test &rarr;</button>
+    </div>
+  </div>
+
+  <!-- PAGE: game -->
+  <div id="page-game" class="page">
+    <div class="game-topbar">
+      <div class="game-left">
+        <span id="pairs-label" style="font-size:13px;color:#888">Pairs: 0 / 40</span>
+        <span class="mode-badge learn" id="mode-badge">Learn</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="accuracy-badge" id="accuracy-badge">Accuracy: &ndash;</span>
+        <button class="danger" style="font-size:12px;padding:4px 12px" onclick="finishEarly()">Finish</button>
+      </div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label"><span>Progress</span><span id="progress-txt">0 / 40</span></div>
+      <div class="bar"><div class="bar-fill" id="bar-fill" style="width:0%"></div></div>
+    </div>
+    <div class="msg" id="msg">Click a Dutch word, then its English match.</div>
+    <div class="game-area">
+      <div><div class="col-header">NL &mdash; Dutch</div><div class="cards-col" id="col-dutch"></div></div>
+      <div><div class="col-header">EN &mdash; English</div><div class="cards-col" id="col-english"></div></div>
+    </div>
+    <div id="success-box" class="success-box" style="display:none">
+      <h2 id="sc-title"></h2>
+      <p id="sc-body"></p>
+      <div class="success-actions" id="sc-actions"></div>
+    </div>
+  </div>
+
+  <!-- PAGE: vocab -->
+  <div id="page-vocab" class="page">
+    <div class="vocab-topbar">
+      <h3>Vocabulary</h3>
+    </div>
+    <div class="word-list" id="word-list"></div>
+    <div class="add-row">
+      <input id="inp-dutch" placeholder="Dutch word" />
+      <input id="inp-english" placeholder="English word" />
+      <button onclick="addWord()">Add</button>
+    </div>
+    <div class="csv-row">
+      <label class="csv-label">
+        <input type="file" accept=".csv" onchange="importCSV(event)" style="display:none">Import CSV
+      </label>
+      <button onclick="exportCSV()">Export CSV</button>
+      <span class="csv-hint">Format: dutch,english</span>
+    </div>
+  </div>
+
+</div>
 <script>
 /* ══════════════════════════════════════════
    DATA
 ══════════════════════════════════════════ */
-const STORE = 'duvoc6';
-const DEFAULT_WORDS = [
+const STORE='duvoc7';
+const DEFAULT_WORDS=[
   "hond|dog","kat|cat","huis|house","water|water","boek|book",
   "auto|car","fiets|bicycle","brood|bread","melk|milk","vriend|friend",
   "stad|city","dag|day","nacht|night","regen|rain","zon|sun",
   "maan|moon","boom|tree","bloem|flower","vogel|bird","vis|fish"
-].map(s=>{const [d,e]=s.split('|');return{d,e,score:0,attempts:0,streak:0};});
+].map(s=>{const[d,e]=s.split('|');return{d,e,score:0,attempts:0,streak:0};});
 
 let words=[];
 function loadWords(){
@@ -236,31 +229,46 @@ function loadWords(){
 function saveWords(){try{localStorage.setItem(STORE,JSON.stringify(words));}catch(e){}}
 
 /* ══════════════════════════════════════════
-   NAVIGATION
+   NAVIGATION  — one function, totally flat
 ══════════════════════════════════════════ */
-let gameActive = false;
-
-function showTab(t){
-  if(gameActive && t==='vocab') return; // block vocab during test
-  ['home','vocab'].forEach(id=>{
-    document.getElementById('tab-'+id).classList.toggle('hidden',id!==t);
-    document.getElementById('tab-btn-'+id).classList.toggle('active',id===t);
-  });
-  if(t==='vocab') renderWordList();
-  if(t==='home')  renderHomeScreen();
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
 }
-
-function showScreen(s){
-  ['home','study','game'].forEach(id=>
-    document.getElementById('screen-'+id).classList.toggle('hidden',id!==s)
-  );
+function showMainTab(t){
+  // only allowed when not in a game/study page
+  if(t==='vocab'){ goVocab(); }
+  else { goHome(); }
+}
+function setTabActive(t){
+  document.querySelectorAll('.tab-bar .tab').forEach((btn,i)=>{
+    btn.classList.toggle('active', (t==='learn'&&i===0)||(t==='vocab'&&i===1));
+  });
+}
+function goHome()  {
+  document.getElementById('main-tabs').style.display='';
+  goPage('home'); renderHomeScreen(); setTabActive('learn');
+}
+function goVocab() {
+  document.getElementById('main-tabs').style.display='';
+  goPage('vocab'); renderWordList(); setTabActive('vocab');
+}
+function goStudy() {
+  // pick 20 words and show study table
+  studyPool = pickWeighted(words, 20);
+  if(!studyPool.length){alert('Add words first.');return;}
+  document.getElementById('study-count').textContent = studyPool.length;
+  document.getElementById('study-tbody').innerHTML = studyPool.map((w,i)=>
+    `<tr><td class="num">${i+1}</td><td class="dutch">${esc(w.d)}</td><td class="english">${esc(w.e)}</td></tr>`
+  ).join('');
+  document.getElementById('main-tabs').style.display='none';
+  goPage('study');
 }
 
 function renderHomeScreen(){
-  // review button: only if there are practised words
-  const practised = words.filter(w=>w.attempts>0);
-  const acts = document.getElementById('review-actions');
-  if(practised.length===0){
+  const practised=words.filter(w=>w.attempts>0);
+  const acts=document.getElementById('review-actions');
+  if(!practised.length){
     acts.innerHTML='<span class="review-empty">No practised words yet — complete a Learn test first.</span>';
   } else {
     acts.innerHTML='';
@@ -273,16 +281,14 @@ function renderHomeScreen(){
 }
 
 /* ══════════════════════════════════════════
-   WEIGHT + POOL HELPERS
+   WEIGHTED HELPERS
 ══════════════════════════════════════════ */
 function weightOf(w){
-  if(!w.attempts) return 4;
-  if(w.streak>=3) return 0.4;
-  if(w.streak>=2) return 0.7;
+  if(!w.attempts)return 4;
+  if(w.streak>=3)return 0.4;
+  if(w.streak>=2)return 0.7;
   return 1+((w.attempts-(w.score||0))/w.attempts)*2;
 }
-
-// Pick n words weighted by weakness (without replacement)
 function pickWeighted(src,n){
   const pool=[],used=new Set();
   const list=src.map((w,i)=>({w,i,wt:weightOf(w)}));
@@ -294,168 +300,113 @@ function pickWeighted(src,n){
   }
   return pool;
 }
-
-/* Build a queue of 40 items:
-   Learn mode:  each of the 20 study words once (20) +
-                30 extra draws weighted by weakness from same 20
-   Review mode: 40 weighted draws from all practised words (with repetition allowed)
-*/
-function buildQueue(pool, mode){
-  if(mode==='learn'){
-    // guaranteed once each
-    const base = shuffle([...pool]);
-    // 30 extra weighted draws (with repetition)
-    const extra=[];
-    for(let i=0;i<30;i++){
-      const w=weightedPick(pool);
-      extra.push(w);
-    }
-    return [...base,...extra];
-  } else {
-    // review: 40 weighted draws with repetition
-    const q=[];
-    for(let i=0;i<40;i++) q.push(weightedPick(pool));
-    return q;
-  }
-}
-
 function weightedPick(src){
   const total=src.reduce((s,w)=>s+weightOf(w),0);
   let r=Math.random()*total;
   for(const w of src){r-=weightOf(w);if(r<=0)return w;}
   return src[src.length-1];
 }
-
-/* ══════════════════════════════════════════
-   LEARN MODE
-══════════════════════════════════════════ */
-const POOL_SIZE=20;
-let studyPool=[];
-
-function startLearn(){
-  studyPool=pickWeighted(words,POOL_SIZE);
-  if(!studyPool.length){alert('Add words first.');return;}
-  document.getElementById('study-count').textContent=studyPool.length;
-  document.getElementById('study-tbody').innerHTML=studyPool.map((w,i)=>
-    `<tr><td class="num">${i+1}</td><td class="dutch">${esc(w.d)}</td><td class="english">${esc(w.e)}</td></tr>`
-  ).join('');
-  showScreen('study');
+function buildQueue(pool,mode){
+  if(mode==='learn'){
+    const base=shuffle([...pool]);
+    const extra=[];
+    for(let i=0;i<30;i++) extra.push(weightedPick(pool));
+    return [...base,...extra];
+  }
+  const q=[];
+  for(let i=0;i<40;i++) q.push(weightedPick(pool));
+  return q;
 }
 
-function beginGame(){
-  if(!studyPool.length)return;
+/* ══════════════════════════════════════════
+   GAME STATE
+══════════════════════════════════════════ */
+const SLOT_COUNT=5;
+const DELAY_EN=1200;
+
+let studyPool=[];
+let slots=[];
+let queue=[];
+let totalPairs=0;
+let completedPairs=0;
+let totalTries=0,totalHits=0;
+let selDutch=null,selEnglish=null;
+let sessionId=0;   // increment on every new game to cancel stale callbacks
+let currentMode='learn';
+
+function startTest(){
+  // called from study page
   initGame(studyPool,'learn');
 }
-
-/* ══════════════════════════════════════════
-   REVIEW MODE
-══════════════════════════════════════════ */
 function startReview(){
   const practised=words.filter(w=>w.attempts>0);
   if(!practised.length){alert('No practised words yet.');return;}
   initGame(practised,'review');
 }
 
-/* ══════════════════════════════════════════
-   GAME ENGINE
-   slots[]: 5 fixed positions on board.
-   queue[]: ordered list of 40 word objects to process.
-   completedPairs: how many of 40 have been correctly matched.
-   Anti-cheat: after correct match, Dutch card appears first,
-   English card appears DELAY_EN ms later at a random position.
-══════════════════════════════════════════ */
-const SLOT_COUNT=5;
-const DELAY_EN=1200; // ms delay before English card appears
-
-let slots=[];      // word|null per slot
-let queue=[];      // remaining pairs to show (40 total)
-let totalPairs=0;  // always 40
-let completedPairs=0;
-let totalTries=0,totalHits=0;
-let selDutch=null,selEnglish=null;
-let currentMode='learn';
-
 function initGame(pool,mode){
+  sessionId++;                  // all pending callbacks from previous game become stale
   currentMode=mode;
-  gameActive=true;
-  lockVocabTab(true);
 
-  totalTries=0; totalHits=0; completedPairs=0; selDutch=null; selEnglish=null;
+  totalTries=0; totalHits=0; completedPairs=0;
+  selDutch=null; selEnglish=null;
 
   queue=buildQueue(pool,mode);
-  totalPairs=queue.length; // 40
+  totalPairs=queue.length;
 
-  // fill initial 5 slots
   slots=[];
   for(let i=0;i<SLOT_COUNT;i++) slots.push(queue.length?queue.shift():null);
 
-  // update mode badge
-  const badge=document.getElementById('mode-badge');
-  badge.textContent=mode==='learn'?'Learn':'Review';
-  badge.className='mode-badge '+(mode==='learn'?'learn':'review');
+  // set up game page UI
+  document.getElementById('mode-badge').textContent=mode==='learn'?'Learn':'Review';
+  document.getElementById('mode-badge').className='mode-badge '+(mode==='learn'?'learn':'review');
+  document.getElementById('success-box').style.display='none';
+  document.getElementById('col-dutch').style.display='';
+  document.getElementById('col-english').style.display='';
 
-  showScreen('game');
-  document.getElementById('success-box').classList.add('hidden');
-  document.getElementById('game-area').classList.remove('hidden');
-
+  document.getElementById('main-tabs').style.display='none';
+  goPage('game');
   renderBoard();
   updateHUD();
   setMsg('Click a Dutch word, then its English match.');
 }
 
-/* ── Board render ── */
+/* ── Board ── */
 function renderBoard(){
   const dc=document.getElementById('col-dutch');
   const ec=document.getElementById('col-english');
   dc.innerHTML=''; ec.innerHTML='';
-
-  // Dutch: always in slot order 0-4
   slots.forEach((w,si)=>{
-    if(w) dc.appendChild(makeCard(w.d,'dutch',si));
-    else  dc.appendChild(makeSpacer(si));
+    dc.appendChild(w ? makeCard(w.d,'dutch',si) : makePH(si));
   });
-
-  // English: shuffled slot order
   shuffle(slots.map((_,i)=>i)).forEach(si=>{
-    const w=slots[si];
-    if(w) ec.appendChild(makeCard(w.e,'english',si));
-    else  ec.appendChild(makeSpacer(si));
+    ec.appendChild(slots[si] ? makeCard(slots[si].e,'english',si) : makePH(si));
   });
 }
 
-function makeCard(text,side,slotIdx){
+function makeCard(text,side,si){
   const d=document.createElement('div');
   d.className='card appear';
   d.textContent=text;
-  d.dataset.side=side; d.dataset.slot=slotIdx; d.dataset.text=text;
+  d.dataset.side=side; d.dataset.slot=si; d.dataset.text=text;
   d.onclick=()=>onCardClick(d);
   return d;
 }
-function makeSpacer(slotIdx){
+function makePH(si){
   const d=document.createElement('div');
-  d.className='placeholder';
-  d.dataset.slot=slotIdx!==undefined?slotIdx:'';
+  d.className='placeholder'; d.dataset.slot=si;
   return d;
 }
 
-/* ── Click ──
-   No global busy lock. Each card locks itself individually via dataset.locked.
-   Only the two cards involved in a check are frozen during animation.
-   Everything else remains clickable immediately.
-── */
+/* ── Click ── */
 function onCardClick(card){
-  if(card.dataset.locked||card.classList.contains('correct')||card.classList.contains('vanish')) return;
+  if(card.dataset.locked||card.classList.contains('correct')) return;
   const side=card.dataset.side;
   if(side==='dutch'){
-    // deselect previous dutch selection (if not locked)
-    document.querySelectorAll('#col-dutch .card.selected').forEach(c=>{
-      if(!c.dataset.locked) c.classList.remove('selected');
-    });
+    document.querySelectorAll('#col-dutch .card.selected').forEach(c=>{if(!c.dataset.locked)c.classList.remove('selected');});
     card.classList.add('selected'); selDutch=card.dataset.text;
   } else {
-    document.querySelectorAll('#col-english .card.selected').forEach(c=>{
-      if(!c.dataset.locked) c.classList.remove('selected');
-    });
+    document.querySelectorAll('#col-english .card.selected').forEach(c=>{if(!c.dataset.locked)c.classList.remove('selected');});
     card.classList.add('selected'); selEnglish=card.dataset.text;
   }
   if(selDutch&&selEnglish) checkPair();
@@ -465,67 +416,51 @@ function onCardClick(card){
 function checkPair(){
   const wo=words.find(w=>w.d===selDutch);
   const isCorrect=wo&&wo.e===selEnglish;
-
   const dcCard=document.querySelector(`#col-dutch  .card[data-text="${CSS.escape(selDutch)}"]`);
   const ecCard=document.querySelector(`#col-english .card[data-text="${CSS.escape(selEnglish)}"]`);
 
-  // Lock only these two cards, free everything else immediately
   if(dcCard) dcCard.dataset.locked='1';
   if(ecCard) ecCard.dataset.locked='1';
-
-  // Clear selection so user can start picking the next pair right away
   selDutch=null; selEnglish=null;
-
   totalTries++;
 
   if(isCorrect){
-    totalHits++;
-    completedPairs++;
-    wo.score=(wo.score||0)+1;
-    wo.attempts=(wo.attempts||0)+1;
-    wo.streak=(wo.streak||0)+1;
+    totalHits++; completedPairs++;
+    wo.score=(wo.score||0)+1; wo.attempts=(wo.attempts||0)+1; wo.streak=(wo.streak||0)+1;
     saveWords(); updateStats();
-
     if(dcCard) dcCard.classList.add('correct');
     if(ecCard) ecCard.classList.add('correct');
     setMsg('Correct!  '+wo.d+' = '+wo.e);
     updateHUD();
 
-    const slotIdx=parseInt(dcCard.dataset.slot,10);
+    const si=parseInt(dcCard.dataset.slot,10);
+    const sid=sessionId; // capture current session
 
     setTimeout(()=>{
-      // Fade out matched cards, replace each with a same-height placeholder
-      // so surrounding cards don't shift position.
-      if(dcCard){
-        const phD=makeSpacer(slotIdx);
-        dcCard.parentNode.replaceChild(phD,dcCard);
-      }
-      if(ecCard){
-        const phE=makeSpacer(slotIdx);
-        ecCard.parentNode.replaceChild(phE,ecCard);
-      }
+      if(sessionId!==sid) return; // stale — new game started
+
+      // replace both cards with placeholders immediately
+      const phD=makePH(si);
+      const phE=makePH(si);
+      if(dcCard&&dcCard.parentNode) dcCard.parentNode.replaceChild(phD,dcCard);
+      if(ecCard&&ecCard.parentNode) ecCard.parentNode.replaceChild(phE,ecCard);
 
       const nextWord=queue.length?queue.shift():null;
-      slots[slotIdx]=nextWord;
+      slots[si]=nextWord;
 
       if(nextWord){
-        // Dutch replaces its placeholder immediately
-        const phD2=document.querySelector(`#col-dutch .placeholder[data-slot="${slotIdx}"]`);
-        const newDc=makeCard(nextWord.d,'dutch',slotIdx);
-        if(phD2) phD2.parentNode.replaceChild(newDc,phD2);
-
-        // English replaces its placeholder after delay (anti-cheat)
+        // Dutch replaces its placeholder right away
+        if(phD.parentNode) phD.parentNode.replaceChild(makeCard(nextWord.d,'dutch',si),phD);
+        // English arrives after delay
         setTimeout(()=>{
-          const phE2=document.querySelector(`#col-english .placeholder[data-slot="${slotIdx}"]`);
-          const newEc=makeCard(nextWord.e,'english',slotIdx);
-          if(phE2) phE2.parentNode.replaceChild(newEc,phE2);
+          if(sessionId!==sid) return;
+          if(phE.parentNode) phE.parentNode.replaceChild(makeCard(nextWord.e,'english',si),phE);
           updateHUD();
-          checkDone();
-        }, DELAY_EN);
+          checkDone(sid);
+        },DELAY_EN);
       } else {
-        // No next word: placeholders stay (empty slot), board shrinks naturally only when all done
         updateHUD();
-        checkDone();
+        checkDone(sid);
       }
     },460);
 
@@ -535,77 +470,58 @@ function checkPair(){
     if(ecCard) ecCard.classList.add('error');
     setMsg('Not quite — try again!');
     setTimeout(()=>{
-      if(dcCard){ dcCard.classList.remove('error','selected'); delete dcCard.dataset.locked; }
-      if(ecCard){ ecCard.classList.remove('error','selected'); delete ecCard.dataset.locked; }
+      if(dcCard){dcCard.classList.remove('error','selected');delete dcCard.dataset.locked;}
+      if(ecCard){ecCard.classList.remove('error','selected');delete ecCard.dataset.locked;}
     },680);
   }
 }
 
-/* ── Done? ── */
-function checkDone(){
-  const boardHasWords=slots.some(s=>s!==null);
-  const queueHasWords=queue.length>0;
-  if(boardHasWords||queueHasWords) return;
-
-  // All 40 pairs completed
+function checkDone(sid){
+  if(sessionId!==sid) return;
+  if(slots.some(s=>s!==null)||queue.length>0) return;
   showSuccess();
 }
 
 function finishEarly(){
   if(!confirm('End the test early and see your results?')) return;
-  // clear pending timers by marking all placeholders as done
+  sessionId++; // cancel all pending callbacks
   queue=[];
   slots=slots.map(()=>null);
   showSuccess();
 }
 
 function showSuccess(){
-  gameActive=false;
-  lockVocabTab(false);
-  document.getElementById('game-area').classList.add('hidden');
+  document.getElementById('col-dutch').style.display='none';
+  document.getElementById('col-english').style.display='none';
   const sb=document.getElementById('success-box');
-  sb.classList.remove('hidden');
+  sb.style.display='block';
   const acc=totalTries>0?Math.round(totalHits/totalTries*100):100;
   document.getElementById('sc-title').textContent='All done!  Accuracy: '+acc+'%';
   document.getElementById('sc-body').textContent=
-    'You completed all '+totalHits+' pairs. '+
+    'You completed '+totalHits+' pairs. '+
     (acc>=90?'Excellent!':acc>=75?'Great job!':'Keep practising to improve.');
   const acts=document.getElementById('sc-actions');
   acts.innerHTML='';
-  const b1=document.createElement('button');b1.className='primary';b1.textContent='Back to home';
-  b1.onclick=()=>{showScreen('home');renderHomeScreen();};
-  const b2=document.createElement('button');b2.textContent='Retry';
-  b2.onclick=()=>{
-    document.getElementById('success-box').classList.add('hidden');
-    if(currentMode==='learn') beginGame();
-    else startReview();
-  };
-  acts.appendChild(b1);acts.appendChild(b2);
+  const b1=document.createElement('button'); b1.className='primary'; b1.textContent='Back to home';
+  b1.onclick=goHome;
+  const b2=document.createElement('button'); b2.textContent='Retry';
+  b2.onclick=()=>{ if(currentMode==='learn') initGame(studyPool,'learn'); else startReview(); };
+  acts.appendChild(b1); acts.appendChild(b2);
 }
 
 /* ── HUD ── */
 function updateHUD(){
   const pct=totalPairs>0?Math.round(completedPairs/totalPairs*100):0;
-  document.getElementById('overall-fill').style.width=pct+'%';
-  document.getElementById('overall-pct').textContent=completedPairs+' / '+totalPairs;
-  document.getElementById('game-subtitle').innerHTML=
-    'Pairs: '+completedPairs+' / '+totalPairs+
-    ' <span class="mode-badge '+(currentMode==='learn'?'learn':'review')+'">'+
-    (currentMode==='learn'?'Learn':'Review')+'</span>';
+  document.getElementById('bar-fill').style.width=pct+'%';
+  document.getElementById('progress-txt').textContent=completedPairs+' / '+totalPairs;
+  document.getElementById('pairs-label').textContent='Pairs: '+completedPairs+' / '+totalPairs;
   const accPct=totalTries>0?Math.round(totalHits/totalTries*100):null;
   document.getElementById('accuracy-badge').textContent='Accuracy: '+(accPct!==null?accPct+'%':'—');
 }
-
 function setMsg(t){document.getElementById('msg').textContent=t;}
 
-function lockVocabTab(lock){
-  const btn=document.getElementById('tab-btn-vocab');
-  btn.disabled=lock;
-  btn.title=lock?'Finish the test to access vocabulary':'';
-}
-
 /* ══════════════════════════════════════════
-   VOCAB TAB
+   VOCAB PAGE
 ══════════════════════════════════════════ */
 function masteryPct(w){if(!w.attempts)return null;return Math.round((w.score||0)/w.attempts*100);}
 function masteryColor(p){return p>=80?'#22a05b':p>=50?'#e6a817':'#e03030';}
@@ -627,14 +543,13 @@ function renderWordList(){
     </div>`;
   }).join('');
 }
-
 function addWord(){
   const d=document.getElementById('inp-dutch').value.trim();
   const e=document.getElementById('inp-english').value.trim();
   if(!d||!e)return;
   if(words.find(w=>w.d.toLowerCase()===d.toLowerCase())){alert('Already exists.');return;}
   words.push({d,e,score:0,attempts:0,streak:0});
-  saveWords();renderWordList();updateStats();
+  saveWords(); renderWordList(); updateStats();
   document.getElementById('inp-dutch').value='';
   document.getElementById('inp-english').value='';
 }
@@ -658,7 +573,8 @@ function importCSV(ev){
 }
 function exportCSV(){
   const blob=new Blob([words.map(w=>w.d+','+w.e).join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dutch-english-vocab.csv';a.click();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='dutch-english-vocab.csv';a.click();
 }
 
 /* ══════════════════════════════════════════
@@ -672,7 +588,7 @@ function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.fl
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 /* boot */
-loadWords();updateStats();renderHomeScreen();
+loadWords(); updateStats(); renderHomeScreen();
 </script>
 </body>
 </html>
