@@ -254,9 +254,28 @@ function goVocab() {
   goPage('vocab'); renderWordList(); setTabActive('vocab');
 }
 function goStudy() {
-  // pick 20 words and show study table
-  studyPool = pickWeighted(words, 20);
-  if(!studyPool.length){alert('Add words first.');return;}
+  if(!words.length){alert('Add words first.');return;}
+
+  // Prioritise words never seen before (attempts === 0)
+  const unseen = words.filter(w=>!w.attempts);
+
+  if(unseen.length === 0){
+    // All words already practised — redirect to Review
+    if(confirm('You have already practised all '+words.length+' words!\n\nPress OK to go to Review instead.')){
+      startReview();
+    }
+    return;
+  }
+
+  // Take up to 20 unseen words; if fewer than 20, fill remainder with weakest seen words
+  let pool = shuffle(unseen).slice(0, 20);
+  if(pool.length < 20){
+    const seen = words.filter(w=>w.attempts>0);
+    const extra = pickWeighted(seen, 20 - pool.length);
+    pool = [...pool, ...extra];
+  }
+
+  studyPool = pool;
   document.getElementById('study-count').textContent = studyPool.length;
   document.getElementById('study-tbody').innerHTML = studyPool.map((w,i)=>
     `<tr><td class="num">${i+1}</td><td class="dutch">${esc(w.d)}</td><td class="english">${esc(w.e)}</td></tr>`
@@ -331,6 +350,7 @@ let totalPairs=0;
 let completedPairs=0;
 let totalTries=0,totalHits=0;
 let selDutch=null,selEnglish=null;
+let selDutchCard=null,selEnglishCard=null;
 let sessionId=0;   // increment on every new game to cancel stale callbacks
 let currentMode='learn';
 
@@ -349,7 +369,7 @@ function initGame(pool,mode){
   currentMode=mode;
 
   totalTries=0; totalHits=0; completedPairs=0;
-  selDutch=null; selEnglish=null;
+  selDutch=null; selEnglish=null; selDutchCard=null; selEnglishCard=null;
 
   queue=buildQueue(pool,mode);
   totalPairs=queue.length;
@@ -404,10 +424,10 @@ function onCardClick(card){
   const side=card.dataset.side;
   if(side==='dutch'){
     document.querySelectorAll('#col-dutch .card.selected').forEach(c=>{if(!c.dataset.locked)c.classList.remove('selected');});
-    card.classList.add('selected'); selDutch=card.dataset.text;
+    card.classList.add('selected'); selDutch=card.dataset.text; selDutchCard=card;
   } else {
     document.querySelectorAll('#col-english .card.selected').forEach(c=>{if(!c.dataset.locked)c.classList.remove('selected');});
-    card.classList.add('selected'); selEnglish=card.dataset.text;
+    card.classList.add('selected'); selEnglish=card.dataset.text; selEnglishCard=card;
   }
   if(selDutch&&selEnglish) checkPair();
 }
@@ -416,12 +436,14 @@ function onCardClick(card){
 function checkPair(){
   const wo=words.find(w=>w.d===selDutch);
   const isCorrect=wo&&wo.e===selEnglish;
-  const dcCard=document.querySelector(`#col-dutch  .card[data-text="${CSS.escape(selDutch)}"]`);
-  const ecCard=document.querySelector(`#col-english .card[data-text="${CSS.escape(selEnglish)}"]`);
+  // Use the stored card elements directly — avoids picking the wrong card
+  // when the same word appears in multiple slots simultaneously.
+  const dcCard=selDutchCard;
+  const ecCard=selEnglishCard;
 
   if(dcCard) dcCard.dataset.locked='1';
   if(ecCard) ecCard.dataset.locked='1';
-  selDutch=null; selEnglish=null;
+  selDutch=null; selEnglish=null; selDutchCard=null; selEnglishCard=null;
   totalTries++;
 
   if(isCorrect){
@@ -498,7 +520,7 @@ function showSuccess(){
   const acc=totalTries>0?Math.round(totalHits/totalTries*100):100;
   document.getElementById('sc-title').textContent='All done!  Accuracy: '+acc+'%';
   document.getElementById('sc-body').textContent=
-    'You completed '+totalHits+' pairs. '+
+    'You completed '+completedPairs+' of '+totalPairs+' pairs. '+
     (acc>=90?'Excellent!':acc>=75?'Great job!':'Keep practising to improve.');
   const acts=document.getElementById('sc-actions');
   acts.innerHTML='';
